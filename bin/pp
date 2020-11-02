@@ -22,11 +22,20 @@ sub chdir_base_dir {
 }
 
 sub gh_repo {
-	my $hgrc = get_base_dir->child('.hg/hgrc')->slurp_utf8;
-	if ( $hgrc =~ /^default.*github\.com\:(.+)\.git$/m ) {
-		return $1;
+	my $base = get_base_dir;
+	if ( $base->child('.hg')->is_dir ) {
+		my $hgrc = $base->child('.hg/hgrc')->slurp_utf8;
+		if ( $hgrc =~ /^default.*github\.com\:(.+)\.git$/m ) {
+			return $1;
+		}
 	}
-	die 'Could not determine Github repo: '. $hgrc;
+	elsif ( $base->child('.git')->is_dir ) {
+		my $gitconfig = $base->child('.git/config')->slurp_utf8;
+		if ( $gitconfig =~ /git\@github\.com\:(.+)\.git$/m ) {
+			return $1;
+		}
+	}
+	die 'Could not determine Github repo';
 }
 
 my %commands; %commands = (
@@ -34,7 +43,7 @@ my %commands; %commands = (
 		print "pp $_\n" for sort keys %commands;
 	},
 	ppedit => sub {
-		system('nano', '~/bin/pp');
+		system('nano', $0);
 	},
 	test => sub {
 		chdir_base_dir();
