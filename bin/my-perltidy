@@ -14,11 +14,13 @@ exit Perl::Tidy::perltidy(
 			$_ = $lines[$i];
 			if ( /^\s*[a-z]/i and $lines[ $i + 1 ] =~ /^\s*\=\>/ ) {
 				$in_keeping = 1;
+				$_ = "\x{23}<<< ZYSTYLE\n$_";
 			}
 			elsif ( $in_keeping and /^\s*\=\>\s*(.+)$/ ) {
 				$in_keeping = 1;
 			}
 			else {
+				$_ = "\x{23}>>> ZYSTYLE\n$_" if $in_keeping;
 				$in_keeping = 0;
 			}
 			$lines[$i] = $_;
@@ -27,6 +29,7 @@ exit Perl::Tidy::perltidy(
 	},
 	postfilter => sub {
 		no warnings;
+		my @lines       = grep !/\x{23}... ZYSTYLE/, split /\r?\n/, $_[0];
 		my $last_indent = '';
 		my $in_pod      = 0;
 		for ( @lines ) {
