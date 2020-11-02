@@ -5,51 +5,49 @@ use warnings;
 use Perl::Tidy;
 
 exit Perl::Tidy::perltidy(
-    perltidyrc => \( do { local $/ = <DATA> } ),
-    prefilter => sub {
-        no warnings;
-        my @lines = split /\r?\n/, $_[0];
-        my $in_keeping;
-        for my $i ( 0 .. $#lines ) {
-            $_ = $lines[$i];
-            if (/^\s*[a-z]/i and $lines[$i+1] =~ /^\s*\=\>/) {
-                $in_keeping = 1;
-                $_ = "#<<< ZYSTYLE\n$_";
-            }
-            elsif ($in_keeping and /^\s*\=\>\s*(.+)$/) {
-                $in_keeping = 1;
-            }
-            else {
-                $_ = "#>>> ZYSTYLE\n$_" if $in_keeping;
-                $in_keeping = 0;
-            }
-            $lines[$i] = $_;
-        }
-        join "\n", @lines;
-    },
-    postfilter => sub {
-        no warnings;
-        my @lines = grep !/\#... ZYSTYLE/, split /\r?\n/, $_[0];
-        my $last_indent = '';
-        my $in_pod = 0;
-        for ( @lines ) {
-            if (/^\=cut/) {
-                $in_pod = 0;
-            }
-            elsif (/^\=[a-z]/) {
-                $in_pod = 1;
-            }
-            next if $in_pod;
-            if (length) {
-                ($last_indent) = /^(\s+)/;
-            }
-            elsif (defined) {
-                $_ = $last_indent;
-            }
-            # s/^(\t*)([ ]+)/$1\t/;
-        }
-        join "\n", @lines;
-    },
+	perltidyrc => \( do { local $/ = <DATA> } ),
+	prefilter  => sub {
+		no warnings;
+		my @lines = split /\r?\n/, $_[0];
+		my $in_keeping;
+		for my $i ( 0 .. $#lines ) {
+			$_ = $lines[$i];
+			if ( /^\s*[a-z]/i and $lines[ $i + 1 ] =~ /^\s*\=\>/ ) {
+				$in_keeping = 1;
+			}
+			elsif ( $in_keeping and /^\s*\=\>\s*(.+)$/ ) {
+				$in_keeping = 1;
+			}
+			else {
+				$in_keeping = 0;
+			}
+			$lines[$i] = $_;
+		} #/ for my $i ( 0 .. $#lines)
+		join "\n", @lines;
+	},
+	postfilter => sub {
+		no warnings;
+		my $last_indent = '';
+		my $in_pod      = 0;
+		for ( @lines ) {
+			if ( /^\=cut/ ) {
+				$in_pod = 0;
+			}
+			elsif ( /^\=[a-z]/ ) {
+				$in_pod = 1;
+			}
+			next if $in_pod;
+			if ( length ) {
+				( $last_indent ) = /^(\s+)/;
+			}
+			elsif ( defined ) {
+				$_ = $last_indent;
+			}
+			
+			# s/^(\t*)([ ]+)/$1\t/;
+		} #/ for ( @lines )
+		join "\n", @lines;
+	},
 );
 
 __DATA__
