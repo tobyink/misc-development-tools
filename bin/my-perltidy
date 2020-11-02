@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Perl::Tidy;
+
+exit Perl::Tidy::perltidy(
+    perltidyrc => \( do { local $/ = <DATA> } ),
+    prefilter => sub {
+        no warnings;
+        my @lines = split /\r?\n/, $_[0];
+        my $in_keeping;
+        for my $i ( 0 .. $#lines ) {
+            $_ = $lines[$i];
+            if (/^\s*[a-z]/i and $lines[$i+1] =~ /^\s*\=\>/) {
+                $in_keeping = 1;
+                $_ = "#<<< ZYSTYLE\n$_";
+            }
+            elsif ($in_keeping and /^\s*\=\>\s*(.+)$/) {
+                $in_keeping = 1;
+            }
+            else {
+                $_ = "#>>> ZYSTYLE\n$_" if $in_keeping;
+                $in_keeping = 0;
+            }
+            $lines[$i] = $_;
+        }
+        join "\n", @lines;
+    },
+    postfilter => sub {
+        no warnings;
+        my @lines = grep !/\#... ZYSTYLE/, split /\r?\n/, $_[0];
+        my $last_indent = '';
+        my $in_pod = 0;
+        for ( @lines ) {
+            if (/^\=cut/) {
+                $in_pod = 0;
+            }
+            elsif (/^\=[a-z]/) {
+                $in_pod = 1;
+            }
+            next if $in_pod;
+            if (length) {
+                ($last_indent) = /^(\s+)/;
+            }
+            elsif (defined) {
+                $_ = $last_indent;
+            }
+            # s/^(\t*)([ ]+)/$1\t/;
+        }
+        join "\n", @lines;
+    },
+);
+
+__DATA__
+
+# Line length
+#
+-l=80         # Line length = 80 chars
+-vmll         # Allow longer lines if deeply indented
+-iscl         # Ignore side comment length
+
+# Indentation
+#
+-i=3          # Indentation amount
+-ci=3         # Continuation indentation amount
+-et=3         # Use tabs
+-noll         # Don't outdent long lines
+-nola         # Don't outdent labels
+-nlop         # Don't do logical padding because it introduces space indents
+-nlp          # Same with list indentation
+
+# Blocks and stuff
+#
+-nce          # No cuddled `else`
+-nbl          # No new line for block after `if`, etc
+-nsbl         # ... including `sub`
+-nbli         # Don't indent braces for block
+-nwn          # Don't weld nested { { ... } } (looks okay in some cases, but not in general, especially for method calls)
+
+# Other whitespace
+#
+-pt=0         # Max whitespace around parentheses ()
+-sbt=1        # Medium whitespace around square brackets []
+-bt=1         # Medium whitespace around braces {}
+-bbt=0        # ... but max if it's a code block
+-tso          # Remove whitespace from secret operators
+-vt=0 -vtc=0  # Vertical tightness. Lots of whitespace.
+-boc          # Keep old comma linebreaks
+-bom          # Keep old method breakpoints
+
+# Closing side comments
+#
+-csc          # Enable them
+-csci=10      # ... but only for blocks of more than 10 lines
+-cscp='#/'    # Prefix
+
+# Misc
+#
+-xs           # Attempt to handle syntax extensions
+-ole=unix     # Line endings = unix

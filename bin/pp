@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Path::Tiny 'path';
+
+sub get_base_dir {
+	my $dir = path('.')->absolute;
+	my $max;
+	while ( $dir->parent->exists and not $dir->child('t')->is_dir ) {
+		$dir = $dir->parent;
+		return if ++$max > 20;
+	}
+	return $dir;
+}
+
+sub chdir_base_dir {
+	my $base = get_base_dir()
+		or die "Could not determine base dir";
+	chdir $base;
+	return $base;
+}
+
+sub gh_repo {
+	my $hgrc = get_base_dir->child('.hg/hgrc')->slurp_utf8;
+	if ( $hgrc =~ /^default.*github\.com\:(.+)\.git$/m ) {
+		return $1;
+	}
+	die 'Could not determine Github repo: '. $hgrc;
+}
+
+my %commands; %commands = (
+	help => sub {
+		print "pp $_\n" for sort keys %commands;
+	},
+	ppedit => sub {
+		system('nano', '~/bin/pp');
+	},
+	test => sub {
+		chdir_base_dir();
+		system('yath');
+	},
+	run => sub {
+		if ( my $base = get_base_dir ) {
+			my $lib = get_base_dir->child('lib');
+			my $inc = get_base_dir->child('lib');
+			system('perl', "-I$inc", "-I$lib", @ARGV);
+		}
+		else {
+			system('perl', @ARGV);
+		}
+	},
+	xtest => sub {
+		chdir_base_dir();
+		$ENV{'EXTENDED_TESTING'} = 1;
+		system('yath');
+	},
+	release => sub {
+		chdir_base_dir();
+		system('distinkt-dist', '--should_release');
+	},
+	ws => sub {
+		chdir_base_dir();
+		my @dirs = @ARGV ? @ARGV : qw( lib t bin scripts script );
+		system('perl', '-MTest::Tabs', '-Eall_perl_files_ok grep -d, @ARGV', @dirs);
+	},
+	gh => sub {
+		my $link = 'https://github.com/' . gh_repo();
+		system("xdg-open '$link' &");
+	},
+	travis => sub {
+		my $link = 'https://travis-ci.com/github/' . gh_repo();
+		system("xdg-open '$link' &");
+	},
+	coveralls => sub {
+		my $link = 'https://coveralls.io/github/' . gh_repo();
+		system("xdg-open '$link' &");
+	},
+	check => sub {
+		chdir_base_dir();
+		system('distinkt-dist', '--TRAVIS', '--targetdir=_build');
+		chdir '_build';
+		system($ENV{SHELL});
+		chdir '..';
+		system('rm', '-fr', '_build');
+	},
+	tidyall => sub {
+		my $base = chdir_base_dir();
+		for ( qw( lib bin script scripts ) ) {
+			my $dir = $base->child($_);
+			$dir->is_dir or next;
+			$dir->visit( sub {
+				my $path = shift->absolute;
+				$path =~ /\.(pm|PL|pl|t)/ or return;
+				system('my-perltidy', '-b', $path);
+				unlink("$path.bak");
+			}, { recurse => 1 } );
+		}
+	},
+);
+
+$commands{ shift || 'test' }->();
