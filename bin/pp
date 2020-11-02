@@ -103,6 +103,7 @@ my %commands;
 				sub {
 					my $path = shift->absolute;
 					$path->is_file or return;
+					$path =~ /\.(pod|pmc)$/ and return;
 					system( 'my-perltidy', '-b', $path );
 					unlink( "$path.bak" );
 				},
