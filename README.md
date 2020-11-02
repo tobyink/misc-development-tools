@@ -31,4 +31,4 @@ tobyink's perltidy script. It's customized to my preferred indentation rules, et
 
 Config files for the atom.io editor. These rely on the command-line tools above, plus the x-terminal, flex-tool-bar, and terminal-commands plugins. They also assume you'll mostly be working on projects that use either Make or Dist::Inkt for build/deployment, and use Mercurial for version control. If you use other tools, it shouldn't be rocket science to tweak these config files.
 
-[https://github.com/tobyink/web-typetiny](web-typetiny) includes an example Makefile and toolbar.cson to add project-specific buttons to the Atom toolbar.
+[web-typetiny](https://github.com/tobyink/web-typetiny) includes an example Makefile and toolbar.cson to add project-specific buttons to the Atom toolbar.
