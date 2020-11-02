@@ -1,0 +1,71 @@
+{
+   "perl:run": {
+      "commands": "pp run ${file}",
+      "key": "f5",
+      "priority": 100
+   },
+   "perl:test": {
+      "commands": "pp test",
+      "key": "alt-f5",
+      "priority": 99
+   },
+   "perl:xtest": {
+      "commands": "pp xtest",
+      "key": "shift-alt-f5",
+      "priority": 98
+   },
+   "perl:gh": {
+      "commands": ["pp gh","exit"]
+   },
+   "perl:travis": {
+      "commands": ["pp travis","exit"]
+   },
+   "perl:coveralls": {
+      "commands": ["pp coveralls","exit"]
+   },
+   "perl:check": {
+      "commands": "pp check"
+   },
+   "perl:release": {
+      "commands": "pp release"
+   },
+   "perl:ws": {
+      "commands": "pp ws"
+   },
+   "perl:tidyall": {
+      "commands": "pp tidyall"
+   },
+   "hg:stat": {
+      "commands": "hg stat"
+   },
+   "hg:push": {
+      "commands": "hg push"
+   },
+   "hg:diff": {
+      "commands": "hg diff"
+   },
+   "make:DEFAULT": {
+      "commands": "make"
+   },
+   "make:all": {
+      "commands": "make all"
+   },
+   "make:deploy-live": {
+      "commands": "make deploy-live"
+   },
+   "make:deploy-staging": {
+      "commands": "make deploy-staging"
+   },
+   "make:deploy-test": {
+      "commands": "make deploy-test"
+   },
+   "make:check": {
+      "commands": "make check"
+   },
+   "make:test": {
+      "commands": "make test"
+   },
+   "make:build": {
+      "commands": "make build"
+   }
+}
