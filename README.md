@@ -1,6 +1,8 @@
 # tobyink's development tools
 
-## bin/pp
+## Command-Line Tools
+
+### bin/pp
 
 Shortcut to run various Perl development tools from the command line. The script is designed so that if your current working directory is somewhere deeply nested in your project directory, the commands will change to the project directory before running. (pp determines the project directory using the existence of a "t" directory within it, which should typically contain the project's test suite, though an empty directory will suffice.)
 
@@ -21,6 +23,10 @@ The idea is for this to be a starting point that you can customize each command 
 
 Running `pp` by itself runs `pp test`.
 
-## bin/my-perltidy
+### bin/my-perltidy
 
 tobyink's perltidy script. It's customized to my preferred indentation rules, etc.
+
+## Atom config
+
+Config files for the atom.io editor. These rely on the command-line tools above, plus the x-terminal, flex-tool-bar, and terminal-commands plugins. They also assume you'll mostly be working on projects that use either Make or Dist::Inkt for build/deployment, and use Mercurial for version control. If you use other tools, it shouldn't be rocket science to tweak these config files.
