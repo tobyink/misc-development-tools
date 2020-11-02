@@ -2,7 +2,7 @@
 
 ## bin/pp
 
-Shortcut to run various Perl development tools from the command line. The script is designed so that if your current working directory is somewhere deeply nested in your project directory, the commands will change to the project directory before running. The idea is for this to be a starting point that you can customize each command for your own development environment/style, add your own commands, etc.
+Shortcut to run various Perl development tools from the command line. The script is designed so that if your current working directory is somewhere deeply nested in your project directory, the commands will change to the project directory before running. (pp determines the project directory using the existence of a "t" directory within it, which should typically contain the project's test suite, though an empty directory will suffice.) The idea is for this to be a starting point that you can customize each command for your own development environment/style, add your own commands, etc.
 
 * `pp run FILENAME` - runs a script in Perl, adding `PROJECTDIR/lib` and `PROJECTDIR/inc` to `@INC`
 * `pp test` - runs test suite (requires App::Yath)
